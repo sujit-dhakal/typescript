@@ -1,31 +1,31 @@
-import { FC } from "react";
-// import { container } from "tsyringe";
+import { FC, useEffect } from "react";
 import { Todo } from "../models/TodoModel";
-import { ITodoService } from "../services/ITodoService";
-// import { TodoService } from "../services/TodoService";
+import { fetchTodos, deleteTodo, updateTodo } from "../app/store";
+import { AppDispatch, RootState } from "../app/store";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
-interface TodoListProps {
-  todoservice: ITodoService;
-  todos: Todo[];
-  setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
-}
+const TodoList: FC = () => {
+  const dispatch: AppDispatch = useDispatch();
+  const todos = useSelector((state: RootState) => state.todos.todos);
 
-const TodoList: FC<TodoListProps> = ({ todoservice, todos, setTodos }) => {
+  useEffect(() => {
+    dispatch(fetchTodos());
+  }, [dispatch]);
   const handleDelete = async (id: number) => {
-    await todoservice.deleteTodo(id);
-    const updatedTodo = await todoservice.getTodos();
-    setTodos(updatedTodo);
+    dispatch(deleteTodo(id));
   };
   const handleToggle = async (todo: Todo) => {
-    const updatedTodo = { ...todo, isComplete: !todo.isComplete };
-    await todoservice.updateTodo(updatedTodo);
-    const updatedTodos = await todoservice.getTodos();
-    setTodos(updatedTodos);
+    const updatedTodoValue = { ...todo, isComplete: !todo.isComplete };
+    dispatch(updateTodo(updatedTodoValue));
   };
   return (
     <div>
       <h1>Todos</h1>
-      <ul>
+      <Link to="/add">
+        <button>Add Todo</button>
+      </Link>
+      <ul style={{ listStyle: "none" }}>
         {todos.map((todo) => {
           return (
             <>

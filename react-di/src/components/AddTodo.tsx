@@ -1,18 +1,14 @@
 import { FC, FormEvent, useState } from "react";
-import { ITodoService } from "../services/ITodoService";
-import { Todo } from "../models/TodoModel";
-interface AddTodoProps {
-  todoservice: ITodoService;
-  todos: Todo[];
-  setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
-}
-const AddTodo: FC<AddTodoProps> = ({ todoservice, todos, setTodos }) => {
+import { useDispatch } from "react-redux";
+import { AppDispatch, addTodo } from "../app/store";
+import { Link } from "react-router-dom";
+const AddTodo: FC = () => {
+  const dispatch: AppDispatch = useDispatch();
   const [name, setName] = useState<string>("");
   const handleAddTodo = async (e: FormEvent) => {
     e.preventDefault();
-    const todo = await todoservice.addTodo(name);
+    await dispatch(addTodo(name));
     setName("");
-    setTodos([...todos, todo]);
   };
   return (
     <div>
@@ -24,6 +20,9 @@ const AddTodo: FC<AddTodoProps> = ({ todoservice, todos, setTodos }) => {
         />
         <button>Add</button>
       </form>
+      <Link to="/">
+        <button>Back To List</button>
+      </Link>
     </div>
   );
 };
